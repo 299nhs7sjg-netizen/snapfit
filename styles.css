@@ -84,6 +84,9 @@ a.btn { display: inline-flex; align-items: center; justify-content: center; text
 }
 .preview-meta { margin: 0; font-size: .82rem; color: var(--muted); text-align: center; }
 .footer { display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem 1.25rem; padding: 1rem 1.5rem 2rem; color: var(--muted); font-size: .85rem; }
+.more-tools { flex-basis: 100%; text-align: center; margin: .15rem 0 0; font-size: .8rem; color: var(--muted); }
+.more-tools a { color: var(--muted); text-decoration: underline; text-underline-offset: 2px; }
+.more-tools a:hover { color: var(--text); }
 .modal[hidden] { display: none !important; }
 .modal { position: fixed; inset: 0; z-index: 50; background: rgba(5,7,16,.72); display: grid; place-items: center; padding: 1rem; }
 .modal-card { width: min(420px,100%); background: linear-gradient(165deg,#232946,#1a1f35); border: 1px solid rgba(255,255,255,.12); border-radius: 18px; padding: 1.4rem 1.35rem 1.25rem; box-shadow: var(--shadow); position: relative; }
