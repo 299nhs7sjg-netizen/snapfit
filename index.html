@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="SnapFit — resize and compress photos for Instagram, X, LinkedIn, TikTok, and more. Private: your photos never leave your browser. $2.99 lifetime unlock." />
+  <title>SnapFit — Resize &amp; Compress for Social</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-blobs" aria-hidden="true"></div>
+
+  <!-- Sticky header ad (free tier) -->
+  <div class="ad-region ad-sticky-top" data-ad="top" data-ad-slot="top" aria-label="Sponsored">
+    <span class="ad-label">Ad</span>
+    <div class="ad-inner" data-ad-creative>
+      <strong>Sponsored</strong> — Resize faster. Unlock SnapFit lifetime for $2.99 → no watermark, full resolution.
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <img src="favicon.svg" alt="" class="brand-icon" width="32" height="32" />
+      <div>
+        <strong>SnapFit</strong>
+        <span class="tagline">Resize &amp; compress for social — private &amp; offline</span>
+      </div>
+    </div>
+    <div class="top-actions">
+      <span id="unlockBadge" class="badge free">Free</span>
+      <button type="button" class="btn ghost" id="unlockBtn">Unlock $2.99</button>
+    </div>
+  </header>
+
+  <div class="ad-wrap-mid">
+    <div class="ad-region ad-mid" data-ad="mid" data-ad-slot="mid" aria-label="Sponsored">
+      <span class="ad-label">Ad</span>
+      <div class="ad-inner" data-ad-creative>
+        <strong>FakeSponsor Pro</strong> — Cloud photo tools that upload your files. Or stay private with SnapFit Unlock ($2.99).
+      </div>
+    </div>
+  </div>
+
+  <main class="layout">
+    <section class="panel drop-panel" id="dropZone" tabindex="0" aria-label="Drop images here">
+      <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden />
+      <div class="drop-inner" id="dropEmpty">
+        <div class="drop-icon" aria-hidden="true">📷</div>
+        <h1>Drop photos here</h1>
+        <p>JPG, PNG, or WebP — processed entirely in your browser. Nothing uploads.</p>
+        <button type="button" class="btn primary" id="pickBtn">Choose images</button>
+      </div>
+      <div class="thumbs" id="thumbs" hidden></div>
+    </section>
+
+    <section class="panel controls-panel">
+      <h2>Size &amp; export</h2>
+      <label class="field">
+        <span>Preset</span>
+        <select id="preset">
+          <option value="original">Original size</option>
+          <option value="ig-post">Instagram Post — 1080×1080</option>
+          <option value="ig-portrait">Instagram Portrait — 1080×1350</option>
+          <option value="ig-story">Instagram / Reels Story — 1080×1920</option>
+          <option value="x-post">X / Twitter Post — 1600×900</option>
+          <option value="x-header">X / Twitter Header — 1500×500</option>
+          <option value="linkedin">LinkedIn Post — 1200×627</option>
+          <option value="tiktok">TikTok / Reels Cover — 1080×1920</option>
+          <option value="facebook">Facebook Post — 1200×630</option>
+          <option value="yt-thumb">YouTube Thumbnail — 1280×720</option>
+          <option value="custom">Custom…</option>
+        </select>
+      </label>
+      <div class="row custom-size" id="customSize" hidden>
+        <label class="field half">
+          <span>Width (px)</span>
+          <input type="number" id="width" min="1" max="8000" value="1080" />
+        </label>
+        <label class="field half">
+          <span>Height (px)</span>
+          <input type="number" id="height" min="1" max="8000" value="1080" />
+        </label>
+      </div>
+      <label class="check">
+        <input type="checkbox" id="keepAspect" checked />
+        <span>Keep aspect ratio (fit inside box)</span>
+      </label>
+      <label class="field">
+        <span>Format</span>
+        <select id="format">
+          <option value="image/jpeg">JPEG</option>
+          <option value="image/webp">WebP</option>
+          <option value="image/png">PNG</option>
+        </select>
+      </label>
+      <label class="field" id="qualityField">
+        <span>Quality <em id="qualityLabel">0.85</em></span>
+        <input type="range" id="quality" min="0.4" max="1" step="0.01" value="0.85" />
+      </label>
+      <div class="free-note" id="freeNote">
+        <strong>Free tier:</strong> max <span id="freeDimLabel">1280</span>px on the long side, quality capped at <span id="freeQLabel">0.75</span>, and a small “SnapFit” watermark on export.
+        <button type="button" class="linkish" id="unlockLink">Unlock lifetime for $2.99 →</button>
+      </div>
+
+      <!-- Ad above download buttons -->
+      <div class="ad-region ad-download" data-ad="download" data-ad-slot="download" aria-label="Sponsored">
+        <span class="ad-label">Ad</span>
+        <div class="ad-inner" data-ad-creative>
+          <strong>Resize faster — Unlock SnapFit $2.99</strong><br />No caps. No watermark. One license key after checkout.
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn primary wide" id="downloadBtn" disabled>Download</button>
+        <button type="button" class="btn ghost" id="downloadAllBtn" disabled>Download all</button>
+        <button type="button" class="btn ghost" id="clearBtn" disabled>Clear</button>
+      </div>
+      <p class="privacy">🔒 Never uploads your photos — 100% client-side.</p>
+    </section>
+
+    <section class="panel preview-panel">
+      <h2>Preview</h2>
+      <!-- Sidebar / preview area banner -->
+      <div class="ad-region ad-sidebar" data-ad="sidebar" aria-label="Sponsored">
+        <span class="ad-label">Ad</span>
+        <div class="ad-inner" data-ad-creative>
+          <strong>PixelPush Ads</strong><br />Your free preview includes ads. Unlock to hide every ad forever — $2.99 lifetime.
+        </div>
+      </div>
+      <div class="preview-wrap">
+        <canvas id="preview" width="400" height="400"></canvas>
+        <p class="preview-meta" id="previewMeta">No image selected</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer banner ad -->
+  <div class="ad-region ad-footer" data-ad="footer" data-ad-slot="footer" aria-label="Sponsored">
+    <span class="ad-label">Ad</span>
+    <div class="ad-inner" data-ad-creative>
+      <strong>Sponsored · SnapFit Unlock</strong> — Creators: kill ads + watermark with one $2.99 license key from the store.
+    </div>
+  </div>
+
+  <footer class="footer">
+    <span>SnapFit · $2.99 lifetime unlock · Built for creators</span>
+    <button type="button" class="linkish" id="footerUnlock">Enter license key</button>
+  </footer>
+
+  <div class="modal" id="unlockModal" hidden role="dialog" aria-modal="true" aria-labelledby="unlockTitle">
+    <div class="modal-card">
+      <button type="button" class="modal-close" id="modalClose" aria-label="Close">×</button>
+      <h2 id="unlockTitle">Unlock SnapFit</h2>
+      <p class="modal-lead">Lifetime unlock for <strong>$2.99</strong> — no watermark, no size/quality caps, no ads, unlimited exports.</p>
+      <ul class="perk-list">
+        <li>Full resolution export</li>
+        <li>Quality up to 100%</li>
+        <li>No watermark</li>
+        <li>All ads removed</li>
+        <li>Works offline forever after unlock</li>
+      </ul>
+
+      <!-- Small ad inside unlock modal (free users) -->
+      <div class="ad-region ad-modal" data-ad="modal" aria-label="Sponsored">
+        <span class="ad-label">Ad</span>
+        <div class="ad-inner" data-ad-creative>
+          Tired of ads? Buy once — unlock hides every ad on this page.
+        </div>
+      </div>
+
+      <a class="btn primary" id="checkoutBuyBtn" href="#" target="_blank" rel="noopener">Buy $2.99 — get license key</a>
+      <p class="tiny" id="checkoutHint" style="margin-top:0.75rem">After checkout, your store email includes a license key. Paste it below.</p>
+      <p class="hint" id="unlockError" hidden></p>
+
+      <label class="field" id="keyField">
+        <span>License key</span>
+        <input type="text" id="licenseKey" placeholder="SF-LIFE-XXXX-XXXX" autocomplete="off" spellcheck="false" />
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn primary" id="applyKeyBtn">Apply license key</button>
+        <button type="button" class="btn ghost" id="demoUnlockBtn" hidden>Demo Unlock (testing)</button>
+      </div>
+      <p class="tiny">Unlock requires a valid license key from a real purchase. No honor unlock.</p>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
