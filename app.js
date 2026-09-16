@@ -7,6 +7,7 @@
   "use strict";
 
   const STORAGE_KEY = "snapfit_unlocked_v1";
+  const SOURCE_KEY = "snapfit_unlock_src_v1";
   const DEMO_KEY = "SF-DEMO-UNLOCK-2026";
   /* Seed sale keys from KEYS.PRIVATE.md + demo (?demo=1 only). */
   const VALID_KEYS = new Set([
@@ -79,26 +80,62 @@
     return String(raw || "").trim().toUpperCase().replace(/\s+/g, "");
   }
 
-  /** Unlock only if stored value is a member of VALID_KEYS (never bare "1"). */
+  /** Unlock if seed VALID_KEYS or a previously Gumroad-verified key (never bare "1"). */
   function isUnlocked() {
     try {
       const v = localStorage.getItem(STORAGE_KEY);
-      return !!(v && VALID_KEYS.has(normalizeKey(v)));
+      if (!v) return false;
+      const k = normalizeKey(v);
+      if (!k || k === "1") return false;
+      if (VALID_KEYS.has(k)) return true;
+      return localStorage.getItem(SOURCE_KEY) === "gumroad";
     } catch (e) {
       return false;
     }
   }
 
-  function setUnlocked(key) {
+  function setUnlocked(key, viaGumroad) {
     const k = normalizeKey(key);
-    if (!VALID_KEYS.has(k)) return false;
+    if (!k || k === "1") return false;
+    if (!viaGumroad && !VALID_KEYS.has(k)) return false;
     unlocked = true;
     try {
       localStorage.setItem(STORAGE_KEY, k);
+      localStorage.setItem(SOURCE_KEY, viaGumroad ? "gumroad" : "seed");
     } catch (e) {}
     refreshUnlockUI();
     scheduleRender();
     return true;
+  }
+
+  async function verifyGumroadLicense(rawKey) {
+    const productId = String(CFG.productId || CFG.product_id || "").trim();
+    const permalink = String(CFG.productPermalink || CFG.product_permalink || "").trim();
+    if (!productId && !permalink) {
+      return { ok: false, message: "Product not configured for license verify." };
+    }
+    const body = new URLSearchParams();
+    if (productId) body.set("product_id", productId);
+    else body.set("product_permalink", permalink);
+    body.set("license_key", String(rawKey || "").trim());
+    const res = await fetch("https://api.gumroad.com/v2/licenses/verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: body.toString()
+    });
+    let data = null;
+    try { data = await res.json(); } catch (e) { data = null; }
+    if (data && data.success === true) {
+      const p = data.purchase || {};
+      if (p.refunded || p.chargebacked || p.disputed) {
+        return { ok: false, message: "This license is no longer valid." };
+      }
+      return { ok: true, data: data };
+    }
+    return {
+      ok: false,
+      message: (data && (data.message || data.error)) || "Invalid key. Buy from the store to receive a license key, then paste it here."
+    };
   }
 
   function hideAllAds() {
@@ -230,21 +267,39 @@
     els.unlockModal.hidden = true;
   }
 
-  function tryUnlock(key) {
-    const k = normalizeKey(key);
+  async function tryUnlock(key) {
+    const raw = String(key || "").trim();
+    const k = normalizeKey(raw);
     if (!k) {
       els.unlockError.textContent = "Paste your license key from the store receipt, then tap Apply.";
       els.unlockError.hidden = false;
       return false;
     }
     if (VALID_KEYS.has(k)) {
-      setUnlocked(k);
+      setUnlocked(k, false);
       closeModal();
       return true;
     }
-    els.unlockError.textContent = "Invalid key. Buy from the store to receive a license key, then paste it here.";
+    if (els.applyKeyBtn) els.applyKeyBtn.disabled = true;
+    els.unlockError.textContent = "Checking license…";
     els.unlockError.hidden = false;
-    return false;
+    try {
+      const result = await verifyGumroadLicense(raw);
+      if (result.ok) {
+        setUnlocked(k, true);
+        closeModal();
+        return true;
+      }
+      els.unlockError.textContent = result.message || "Invalid key. Buy from the store to receive a license key, then paste it here.";
+      els.unlockError.hidden = false;
+      return false;
+    } catch (e) {
+      els.unlockError.textContent = "Could not verify license. Check your connection and try again.";
+      els.unlockError.hidden = false;
+      return false;
+    } finally {
+      if (els.applyKeyBtn) els.applyKeyBtn.disabled = false;
+    }
   }
 
   function loadImage(file) {
@@ -536,11 +591,12 @@
     if (e.key === "Escape" && !els.unlockModal.hidden) closeModal();
   });
 
-  /* Clear legacy honor unlock ("1") so free users must use a real key */
+  /* Clear legacy honor unlock ("1") only — keep seed + Gumroad-verified keys */
   try {
     const legacy = localStorage.getItem(STORAGE_KEY);
-    if (legacy === "1" || (legacy && !VALID_KEYS.has(normalizeKey(legacy)))) {
+    if (legacy === "1") {
       localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(SOURCE_KEY);
     }
   } catch (e) {}
 
