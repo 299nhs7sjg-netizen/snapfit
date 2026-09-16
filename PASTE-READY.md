@@ -1,12 +1,12 @@
 # SnapFit — Paste-ready (@ $2.99)
 
-**Live:** YOUR_LIVE_URL (CoS rebrand in progress)  
+**Live:** https://299nhs7sjg-netizen.github.io/snapfit/ (CoS rebrand in progress)  
 **Checkout:** YOUR_CHECKOUT_URL  
 **Soft CTA:** Try free → Unlock $2.99  
 **Rules:** NEVER use the old product name. No LinkedIn. $0 ads.
 
 ## Soft CTA
-Try free: YOUR_LIVE_URL  
+Try free: https://299nhs7sjg-netizen.github.io/snapfit/  
 Unlock lifetime — $2.99: YOUR_CHECKOUT_URL
 
 ## X
@@ -16,7 +16,7 @@ Built **SnapFit** — resize + compress in the browser. Photos never leave your 
 
 Free to try → $2.99 lifetime unlock.
 
-Try: YOUR_LIVE_URL  
+Try: https://299nhs7sjg-netizen.github.io/snapfit/  
 Unlock: YOUR_CHECKOUT_URL
 
 ## Reddit (r/sideproject)
@@ -29,7 +29,7 @@ Unlock: YOUR_CHECKOUT_URL
 
 Free tier + **$2.99** lifetime license unlock.
 
-Live: YOUR_LIVE_URL  
+Live: https://299nhs7sjg-netizen.github.io/snapfit/  
 Unlock: YOUR_CHECKOUT_URL
 
 Feedback welcome.
@@ -37,5 +37,5 @@ Feedback welcome.
 ## Indie Hackers
 SnapFit — $2.99 lifetime, client-side social image resize. Free tier (limits + ads) → license unlock.
 
-Live: YOUR_LIVE_URL  
+Live: https://299nhs7sjg-netizen.github.io/snapfit/  
 Unlock: YOUR_CHECKOUT_URL
