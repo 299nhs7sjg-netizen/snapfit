@@ -69,7 +69,10 @@
     freeNote: $("freeNote"), freeDimLabel: $("freeDimLabel"), freeQLabel: $("freeQLabel"),
     downloadBtn: $("downloadBtn"), downloadAllBtn: $("downloadAllBtn"), clearBtn: $("clearBtn"),
     preview: $("preview"), previewMeta: $("previewMeta"), unlockBtn: $("unlockBtn"),
-    unlockLink: $("unlockLink"), footerUnlock: $("footerUnlock"), unlockBadge: $("unlockBadge"),
+    unlockLink: $("unlockLink"), unlockNearExport: $("unlockNearExport"),
+    unlockInline: $("unlockInline"), stickyUnlock: $("stickyUnlock"),
+    stickyUnlockBtn: $("stickyUnlockBtn"), footerUnlock: $("footerUnlock"),
+    footerBuy: $("footerBuy"), unlockBadge: $("unlockBadge"),
     unlockModal: $("unlockModal"), modalClose: $("modalClose"), licenseKey: $("licenseKey"),
     applyKeyBtn: $("applyKeyBtn"), keyField: $("keyField"),
     demoUnlockBtn: $("demoUnlockBtn"), unlockError: $("unlockError"),
@@ -188,32 +191,48 @@
   }
 
   function wireCheckoutButton() {
-    const btn = els.checkoutBuyBtn;
-    const hint = els.checkoutHint;
-    if (!btn) return;
     const url = (CFG.checkoutUrl || "").trim();
-    if (url) {
-      btn.href = url;
-      btn.removeAttribute("aria-disabled");
-      btn.classList.remove("is-disabled");
-      if (hint) {
-        hint.textContent = "After checkout, your store email includes a license key. Paste it below.";
+    const hint = els.checkoutHint;
+    const links = document.querySelectorAll("[data-checkout]");
+    links.forEach(function (el) {
+      if (url) {
+        el.href = url;
+        el.setAttribute("target", "_blank");
+        el.setAttribute("rel", "noopener");
+        el.removeAttribute("aria-disabled");
+        el.classList.remove("is-disabled");
+        el.onclick = null;
+      } else {
+        el.href = "#";
+        el.setAttribute("aria-disabled", "true");
+        el.classList.add("is-disabled");
+        el.onclick = function (e) {
+          e.preventDefault();
+          if (els.unlockError) {
+            els.unlockError.textContent =
+              "Checkout URL not set. Operator: paste Gumroad URL into config.js → checkoutUrl, then redeploy.";
+            els.unlockError.hidden = false;
+          }
+        };
       }
-      btn.onclick = null;
-    } else {
-      btn.href = "#";
-      btn.setAttribute("aria-disabled", "true");
-      btn.classList.add("is-disabled");
-      if (hint) {
-        hint.textContent = "Checkout URL not set — paste your Gumroad or Lemon Squeezy product URL into config.js → checkoutUrl, then redeploy.";
+    });
+    if (els.checkoutBuyBtn && url) {
+      els.checkoutBuyBtn.href = url;
+      els.checkoutBuyBtn.setAttribute("target", "_blank");
+      els.checkoutBuyBtn.setAttribute("rel", "noopener");
+    }
+    if (hint) {
+      if (url) {
+        hint.hidden = false;
+        hint.style.color = "var(--muted)";
+        hint.textContent =
+          "After checkout, your store email includes a license key. Paste it below.";
+      } else {
+        hint.hidden = false;
+        hint.style.color = "var(--danger)";
+        hint.textContent =
+          "Checkout URL not set — operator: paste Gumroad snapfit-lifetime URL into config.js → checkoutUrl, then redeploy.";
       }
-      btn.onclick = function (e) {
-        e.preventDefault();
-        if (els.unlockError) {
-          els.unlockError.textContent = "Checkout URL not set. Create a Gumroad or Lemon Squeezy product ($2.99) and paste the URL into config.js.";
-          els.unlockError.hidden = false;
-        }
-      };
     }
   }
 
@@ -225,6 +244,11 @@
       els.unlockBtn.textContent = "Unlocked ✓";
       els.unlockBtn.disabled = true;
       els.freeNote.hidden = true;
+      if (els.unlockInline) els.unlockInline.hidden = true;
+      if (els.stickyUnlock) els.stickyUnlock.hidden = true;
+      document.body.classList.remove("has-sticky-unlock");
+      if (els.footerUnlock) els.footerUnlock.hidden = true;
+      if (els.footerBuy) els.footerBuy.hidden = true;
       els.quality.max = "1";
       hideAllAds();
     } else {
@@ -233,6 +257,11 @@
       els.unlockBtn.textContent = "Unlock $2.99";
       els.unlockBtn.disabled = false;
       els.freeNote.hidden = false;
+      if (els.unlockInline) els.unlockInline.hidden = false;
+      if (els.stickyUnlock) els.stickyUnlock.hidden = false;
+      document.body.classList.add("has-sticky-unlock");
+      if (els.footerUnlock) els.footerUnlock.hidden = false;
+      if (els.footerBuy) els.footerBuy.hidden = false;
       els.freeDimLabel.textContent = String(FREE.maxLongSide);
       els.freeQLabel.textContent = String(FREE.maxQuality);
       if (parseFloat(els.quality.value) > FREE.maxQuality) {
@@ -570,8 +599,10 @@
   els.downloadAllBtn.addEventListener("click", downloadAll);
   els.clearBtn.addEventListener("click", clearAll);
   els.unlockBtn.addEventListener("click", openModal);
-  els.unlockLink.addEventListener("click", openModal);
-  els.footerUnlock.addEventListener("click", openModal);
+  if (els.unlockLink) els.unlockLink.addEventListener("click", openModal);
+  if (els.unlockNearExport) els.unlockNearExport.addEventListener("click", openModal);
+  if (els.stickyUnlockBtn) els.stickyUnlockBtn.addEventListener("click", openModal);
+  if (els.footerUnlock) els.footerUnlock.addEventListener("click", openModal);
   els.modalClose.addEventListener("click", closeModal);
   els.unlockModal.addEventListener("click", function (e) {
     if (e.target === els.unlockModal) closeModal();
